@@ -16,7 +16,7 @@ jobs:
       - name: Setup Arduino CLI
         uses: arduino/setup-arduino-cli@v2
         with:
-          version: "latest"
+          version: "0.35.2" # Chỉ định phiên bản cố định để không bị lỗi fetch API
 
       - name: Install ESP32 Board Core
         run: |
@@ -37,4 +37,4 @@ jobs:
         with:
           name: esp32s3-nightcam-firmware
           path: ./build/*.bin
-          
+        
