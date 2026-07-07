@@ -1,0 +1,40 @@
+name: Build ESP32-S3 Firmware
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Giúp bạn có thể bấm nút Tự động biên dịch bằng tay bất cứ lúc nào
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+        with:
+          version: "latest"
+
+      - name: Install ESP32 Board Core
+        run: |
+          arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core install esp32:esp32 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+
+      - name: Install LovyanGFX Library
+        run: |
+          arduino-cli lib install LovyanGFX
+
+      - name: Compile Code to BIN
+        run: |
+          # Dùng cờ cấu hình ép bật OPI PSRAM cho ESP32-S3 giống y hệt trên PC
+          arduino-cli compile --fqbn esp32:esp32:esp32s3:CDCACM=1,MSM=1,FlashSize=16M,PSRAM=opi --output-dir ./build ./nightcam
+
+      - name: Upload Firmware BIN Product
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32s3-nightcam-firmware
+          path: ./build/*.bin
+          
