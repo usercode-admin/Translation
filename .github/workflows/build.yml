@@ -8,7 +8,6 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -27,16 +26,13 @@ jobs:
         run: |
           arduino-cli lib install LovyanGFX
 
-      - name: Compile Code to BIN
+      - name: Compile Code
         run: |
           mkdir -p ./build
-          # Chỉ định chuẩn xác file nightcam.ino nằm trong thư mục "night cam"
-          arduino-cli compile \
-            --fqbn esp32:esp32:esp32s3:MCU=esp32s3,PartitionScheme=huge_app,PSRAM=opi \
-            --output-dir ./build \
-            "./night cam/nightcam.ino"
+          # Lệnh này tự động tìm file .ino bất kể nó nằm ở thư mục nào
+          find . -name "*.ino" -exec arduino-cli compile --fqbn esp32:esp32:esp32s3:MCU=esp32s3,PartitionScheme=huge_app,PSRAM=opi --output-dir ./build {} \;
 
-      - name: Upload Firmware BIN Product
+      - name: Upload Firmware
         uses: actions/upload-artifact@v4
         with:
           name: esp32s3-nightcam-firmware
