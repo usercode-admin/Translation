@@ -22,19 +22,22 @@ jobs:
           arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
           arduino-cli core install esp32:esp32@3.0.2 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 
-      - name: Install LovyanGFX Library
+      - name: Install Dependencies
         run: |
           arduino-cli lib install LovyanGFX
+          arduino-cli lib install "ESP32 camera"
 
       - name: Compile Code
         run: |
-          # Biên dịch trực tiếp tại thư mục hiện tại và ép xuất file ra thư mục ./build
-          # Dùng dấu chấm '.' để chỉ định tìm file .ino trong thư mục hiện tại
-          arduino-cli compile --fqbn esp32:esp32:esp32s3:MCU=esp32s3,PartitionScheme=huge_app,PSRAM=opi --output-dir ./build .
+          # Dùng -v (verbose) để nó in ra tất cả mọi thứ nó đang làm
+          arduino-cli compile -v --fqbn esp32:esp32:esp32s3:MCU=esp32s3,PartitionScheme=huge_app,PSRAM=opi --output-dir ./build "./night cam"
+
+      - name: Check files
+        run: ls -R ./build
 
       - name: Upload Firmware
         uses: actions/upload-artifact@v4
         with:
-          name: esp32s3-nightcam-firmware
+          name: firmware
           path: ./build/
           
