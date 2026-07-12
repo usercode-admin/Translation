@@ -28,13 +28,15 @@ jobs:
 
       - name: Compile Code
         run: |
+          # Biên dịch trực tiếp và không dùng --output-dir để tránh lạc tệp
+          find . -name "*.ino" -exec arduino-cli compile --fqbn esp32:esp32:esp32s3:MCU=esp32s3,PartitionScheme=huge_app,PSRAM=opi {} \;
+          # Gom tất cả file .bin được sinh ra vào thư mục build để upload
           mkdir -p ./build
-          # Lệnh này tự động tìm file .ino bất kể nó nằm ở thư mục nào
-          find . -name "*.ino" -exec arduino-cli compile --fqbn esp32:esp32:esp32s3:MCU=esp32s3,PartitionScheme=huge_app,PSRAM=opi --output-dir ./build {} \;
+          find . -name "*.bin" -exec cp {} ./build/ \;
 
       - name: Upload Firmware
         uses: actions/upload-artifact@v4
         with:
           name: esp32s3-nightcam-firmware
-          path: ./build/*.bin
+          path: ./build/
           
